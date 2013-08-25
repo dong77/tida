@@ -64,3 +64,22 @@ Tida把半衰期权重计算放到服务端去做，这样客户端不必读取R
 
 - 一次读取多个key的权重。
 - 在上一条基础上做排序，并截取top N。
+
+##完整的使用代码示例
+
+```
+include com.dongw.tida._
+import redis.clients.jedis._
+
+object Test {
+  def main(args: Array[String]) = {
+    val pool = new JedisPool(new JedisPoolConfig(), "localhost")
+    val impl = new HalfLifeDecayWeighter(pool, 1 /* minute */)
+    (1 to 10) foreach { i =>
+      println("write " + impl.addWeight("id", Weight(1000, i * 60000))) // one minute later
+      println("read " + impl.getWeight("id", i * 60000))
+    }
+    pool.destroy()
+  }
+}
+```
