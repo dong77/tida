@@ -6,7 +6,7 @@ case class Weight(value: Int, timestampMillis: Long = System.currentTimeMillis()
 
 class HalfLifeDecayWeighter(pool: JedisPool, halfLifeMinutes: Int) {
   private val halfLifeSecondsAsString = (halfLifeMinutes * 60).toString
-  private val expireSecondsAsString = (halfLifeMinutes * 60 * 10).toString // 10 half-life
+  private val expireSecondsAsString = (halfLifeMinutes * 60 * 10).toString
   private val addWeightSHA = loadLuaResource("add_weight.lua")
   private val singleReadWeightSHA = loadLuaResource("single_read_weight.lua")
 
@@ -55,17 +55,5 @@ class HalfLifeDecayWeighter(pool: JedisPool, halfLifeMinutes: Int) {
     } finally {
       pool.returnResourceObject(jedis)
     }
-  }
-}
-
-object Test {
-  def main(args: Array[String]) = {
-    val pool = new JedisPool(new JedisPoolConfig(), "localhost")
-    val impl = new HalfLifeDecayWeighter(pool, 1)
-    (1 to 10) foreach { i =>
-      println("write " + impl.addWeight("YYY", Weight(1000, i * 60000)))
-      println("read " + impl.getWeight("YYY", i * 60000))
-    }
-    pool.destroy()
   }
 }
