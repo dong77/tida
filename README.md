@@ -11,7 +11,7 @@ Tida是一个极其简单的权重累加器。后台是redis数据库，支持�
 设定半衰期是为了把用户过去行为的权重做适当的降权处理。假设半衰期设定为一个星期，那么一个星期前一个行为的权重将变成当时设定时候的1/2。半衰期越短，时间效应月明显。
 
 ```
-include com.dongw.tida._
+import com.dongw.tida._
 val pool = new JedisPool(new JedisPoolConfig(), "localhost")
 val weighter = new HalfLifeDecayWeighter(pool, 10 /* minutes */)
 ```
@@ -68,7 +68,7 @@ Tida把半衰期权重计算放到服务端去做，这样客户端不必读取R
 ##完整的使用代码示例
 
 ```
-include com.dongw.tida._
+import com.dongw.tida._
 import redis.clients.jedis._
 
 object Test {
