@@ -7,7 +7,6 @@ local weight = tonumber(ARGV[4])
 
 -- check parameters
 if not key then return 0 end
-
 if not half_life or half_life <= 0 then return 0 end
 if not expire or expire < 0 then return 0 end 
 if not timestamp or timestamp < 0 then return 0 end
