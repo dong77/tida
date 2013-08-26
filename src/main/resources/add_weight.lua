@@ -21,9 +21,9 @@ if redis.call("EXISTS", key) == 0 then
 end
 
 -- if the key exists
-local payload = cmsgpack.unpack(redis.call("GET",key))
-local modified = payload[1]
-local sum = payload[2]
+local payload	= cmsgpack.unpack(redis.call("GET",key))
+local modified	= payload[1]
+local sum	= payload[2]
 
 -- update sum
 if timestamp >= modified then
