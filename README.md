@@ -24,12 +24,11 @@ val weighter = new HalfLifeDecayWeighter(pool, 10 /* minutes */)
 
 ```
 val key = userId + "@" + categoryId
-var weight = 1000 // a weight caused by a single product click
 
+var weight = 1000 // a weight caused by a single product click
 weighter.addWeight(key, Weight(weight, 26157161516116 /*  time in milliseconds when this happened */)
 
 weight = 10000 // a weight caused by a single product purchase
-
 weighter.addWeight(key, Weight(weight /* omit the second parameter so defaults to current time */)
 ```
 
