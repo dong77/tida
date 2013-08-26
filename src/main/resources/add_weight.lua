@@ -1,9 +1,9 @@
 -- all time/time-span are in seconds
-local key = KEYS[1]
-local half_life = tonumber(ARGV[1])
-local expire = tonumber(ARGV[2])
-local timestamp = tonumber(ARGV[3])
-local weight = tonumber(ARGV[4])
+local ke	= KEYS[1]
+local half_lif	= tonumber(ARGV[1])
+local expir	= tonumber(ARGV[2])
+local timestamp	= tonumber(ARGV[3])
+local weight	= tonumber(ARGV[4])
 
 -- check parameters
 if not key then return 0 end
