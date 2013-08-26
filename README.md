@@ -53,9 +53,13 @@ var weight = 1000 // a weight caused by a single product click
 weighter.getWeight(key， 26157161516116)
 ```
 
+###Caveat
+有一点值得注意：lua代码返回的数值会被转化成整形。所以尽量使用远大于1的权重。
+
 ##Tida和直接Redis访问方式的区别
 
 Tida把半衰期权重计算放到服务端去做，这样客户端不必读取Redis数据库的值，返回到客户单，然后在存回去。Tida把3次网络数据交换变成1此。
+
 
 ##外部依赖
  - jedis 2.1.0
