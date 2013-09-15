@@ -26,15 +26,9 @@ local payload = cmsgpack.unpack(redis.call("GET",key))
 local modified = payload[1]
 local sum = payload[2]
 
--- update sum
-if timestamp >= modified then
-	local decay = math.exp((timestamp - modified)  * math.log(0.5) / half_life)
-	sum = weight + sum * decay
-	modified = timestamp
-else
-	local decay = math.exp((modified - timestamp)  * math.log(0.5) / half_life)
-	sum = weight * decay + sum
-end
+-- update sum & modified
+sum = weight + sum * math.pow(0.5, (timestamp - modified) * 1.0 / half_life)
+modified = timestamp
 
 -- the new sum is very close to 0 or less, we remove this key
 if sum < 0.00001 then

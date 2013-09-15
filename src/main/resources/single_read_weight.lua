@@ -15,5 +15,5 @@ if redis.call("EXISTS", key) == 0 then return 0 end
 local payload = cmsgpack.unpack(redis.call("GET",key))
 local modified = payload[1]
 local sum = payload[2]
-local decay = math.exp((timestamp - modified)  * math.log(0.5) / half_life)
-return  sum * decay  -- result will be auto-convert to Integer or Long
+
+return sum * math.pow(0.5, (timestamp - modified) * 1.0 / half_life)
