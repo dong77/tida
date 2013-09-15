@@ -8,7 +8,7 @@ Tida是一个极其简单的权重累加器。后台是redis数据库，支持�
 ##怎样用Tida
 
 ###设定何时的半衰期
-设定半衰期是为了把用户过去行为的权重做适当的降权处理。假设半衰期设定为一个星期，那么一个星期前一个行为的权重将变成当时设定时候的1/2。半衰期越短，时间效应月明显。
+设定半衰期是为了把用户过去行为的权重做适当的降权处理。假设半衰期设定为一个星期，那么一个星期前一个行为的权重将变成当时设定时候的1/2。半衰期越短，时间效应越明显。
 
 ```
 import com.dongw.tida._
@@ -24,12 +24,11 @@ val weighter = new HalfLifeDecayWeighter(pool, 10 /* minutes */)
 
 ```
 val key = userId + "@" + categoryId
-var weight = 1000 // a weight caused by a single product click
 
+var weight = 1000 // a weight caused by a single product click
 weighter.addWeight(key, Weight(weight, 26157161516116 /*  time in milliseconds when this happened */)
 
 weight = 10000 // a weight caused by a single product purchase
-
 weighter.addWeight(key, Weight(weight /* omit the second parameter so defaults to current time */)
 ```
 
@@ -39,8 +38,6 @@ weighter.addWeight(key, Weight(weight /* omit the second parameter so defaults t
 
 ```
 val key = userId + "@" + categoryId
-var weight = 1000 // a weight caused by a single product click
-
 weighter.getWeight(key)
 ```
 
@@ -48,8 +45,6 @@ weighter.getWeight(key)
 
 ```
 val key = userId + "@" + categoryId
-var weight = 1000 // a weight caused by a single product click
-
 weighter.getWeight(key， 26157161516116)
 ```
 

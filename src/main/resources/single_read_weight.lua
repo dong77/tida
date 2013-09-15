@@ -1,5 +1,5 @@
 -- all time/time-span are in seconds
-local key = KEYS[1]
+local key       = KEYS[1]
 local half_life = tonumber(ARGV[1])
 local timestamp = tonumber(ARGV[2])
 

@@ -1,13 +1,12 @@
 -- all time/time-span are in seconds
-local key = KEYS[1]
-local half_life = tonumber(ARGV[1])
-local expire = tonumber(ARGV[2])
-local timestamp = tonumber(ARGV[3])
-local weight = tonumber(ARGV[4])
+local ke	= KEYS[1]
+local half_lif	= tonumber(ARGV[1])
+local expir	= tonumber(ARGV[2])
+local timestamp	= tonumber(ARGV[3])
+local weight	= tonumber(ARGV[4])
 
 -- check parameters
 if not key then return 0 end
-
 if not half_life or half_life <= 0 then return 0 end
 if not expire or expire < 0 then return 0 end 
 if not timestamp or timestamp < 0 then return 0 end
@@ -22,9 +21,9 @@ if redis.call("EXISTS", key) == 0 then
 end
 
 -- if the key exists
-local payload = cmsgpack.unpack(redis.call("GET",key))
-local modified = payload[1]
-local sum = payload[2]
+local payload	= cmsgpack.unpack(redis.call("GET",key))
+local modified	= payload[1]
+local sum	= payload[2]
 
 -- update sum & modified
 sum = weight + sum * math.pow(0.5, (timestamp - modified) * 1.0 / half_life)
