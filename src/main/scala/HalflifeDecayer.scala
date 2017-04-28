@@ -7,9 +7,7 @@ import scala.concurrent.duration._
 import redis.protocol.Integer
 
 class HalflifeDecayer(halflife: Duration)(
-    implicit
-    ec: ExecutionContext, redis: RedisClient
-) extends Decayer {
+  implicit ec: ExecutionContext, redis: RedisClient) extends Decayer {
 
   private def scriptFromResource(resource: String) = {
     val file = getClass.getResource(resource).getFile
@@ -17,8 +15,8 @@ class HalflifeDecayer(halflife: Duration)(
     RedisScript(content)
   }
 
-  private val getValueScript = scriptFromResource("/get_value.lua")
-  private val addValueScript = scriptFromResource("/add_value.lua")
+  private val getValueScript = scriptFromResource("/halflife_get_value.lua")
+  private val addValueScript = scriptFromResource("/halflife_add_value.lua")
 
   private val halfLifeMillisAsString = halflife.toMillis.toString
   private val expireMillisAsString = (halflife.toMillis * 20).toString
@@ -31,9 +29,7 @@ class HalflifeDecayer(halflife: Duration)(
         halfLifeMillisAsString,
         expireMillisAsString,
         time.toString,
-        value.toString
-      )
-    ).map(_ match {
+        value.toString)).map(_ match {
         case v: Integer => v.toLong
         case _ => throw new Exception("Integer reply expected!")
       })
@@ -45,9 +41,7 @@ class HalflifeDecayer(halflife: Duration)(
       Seq(key),
       Seq(
         halfLifeMillisAsString,
-        time.toString
-      )
-    ).map(_ match {
+        time.toString)).map(_ match {
         case v: Integer => v.toLong
         case _ => throw new Exception("Integer reply expected!")
       })
