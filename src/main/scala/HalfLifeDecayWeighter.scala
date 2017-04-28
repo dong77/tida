@@ -1,64 +1,53 @@
 package com.dong.tools.tida
 
-import redis.clients.jedis._
-// import org.msgpack._
-// import org.msgpack.template.Templates
+import redis.api.scripting.RedisScript
+import redis.protocol.{ Bulk, MultiBulk }
+import redis.RedisClient
+import scala.concurrent._
 
-case class Weight(value: Int, timestampMillis: Long = System.currentTimeMillis)
+// case class Weight(value: Long, timestamp: Long = System.currentTimeMillis)
 
-class HalfLifeDecayWeighter(pool: JedisPool, halfLifeMinutes: Int) {
-  private val halfLifeSecondsAsString = (halfLifeMinutes * 60).toString
-  private val expireSecondsAsString = (halfLifeMinutes * 60 * 20).toString
-  private val addWeightSHA = loadLuaResource("add_weight.lua")
-  private val singleReadWeightSHA = loadLuaResource("single_read_weight.lua")
+class Xyz(redis: RedisClient, halfLifeSeconds: Int)(implicit ec: ExecutionContext) {
 
-  def addWeight(key: String, weight: Weight): Long =
-    borrow { jedis =>
-      try {
-        jedis.evalsha(
-          addWeightSHA,
-          1,
-          key, // keys to save
-          halfLifeSecondsAsString,
-          expireSecondsAsString,
-          (weight.timestampMillis / 1000).toString, // current time in second
-          weight.value.toString
-        ).toString().toLong
-      } catch {
-        case _: Throwable => 0
-      }
-    }
+  private def scriptFromResource(resource: String) = {
+    val file = getClass.getResource("/" + resource).getFile
+    val content = scala.io.Source.fromFile(file).mkString
+    RedisScript(content)
+  }
 
-  def getWeight(key: String, timestampMillis: Long = System.currentTimeMillis): Long =
-    borrow { jedis =>
-      try {
-        jedis.evalsha(
-          singleReadWeightSHA,
-          1,
-          key,
-          halfLifeSecondsAsString,
-          (timestampMillis / 1000).toString
-        ).toString().toLong
-      } catch {
-        case _: Throwable => 0
-      }
-    }
+  private val getWeightScript = scriptFromResource("get_weight.lua")
+  private val modWeightScript = scriptFromResource("modify_weight.lua")
 
-  private def loadLuaResource(fileName: String): String =
-    borrow { jedis =>
-      val file = getClass.getResource("/" + fileName).getFile
-      val content = scala.io.Source.fromFile(file).mkString
-      val sha = jedis.scriptLoad(content)
-      println("Lua script loaded: " + sha)
-      sha
-    }
+  private val halfLifeSecondsAsString = halfLifeSeconds.toString
+  private val expireSecondsAsString = (halfLifeSeconds * 20).toString
 
-  private def borrow[T](method: Jedis => T): T = {
-    val jedis = pool.getResource()
-    try {
-      method(jedis)
-    } finally {
-      pool.returnResourceObject(jedis)
-    }
+  def addWeight(key: String, weight: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+    redis.evalshaOrEval(
+      modWeightScript,
+      Seq(key),
+      Seq(
+        halfLifeSecondsAsString,
+        expireSecondsAsString,
+        (time / 1000).toString,
+        weight.toString
+      )
+    ).map(_ match {
+        case b: Bulk => b.toString.toLong
+        case _ => throw new Exception("Bulk reply expected!")
+      })
+  }
+
+  def getWeight(key: String, time: Long = System.currentTimeMillis): Future[Long] = {
+    redis.evalshaOrEval(
+      getWeightScript,
+      Seq(key),
+      Seq(
+        halfLifeSecondsAsString,
+        (time / 1000).toString
+      )
+    ).map(_ match {
+        case b: Bulk => b.toString.toLong
+        case _ => throw new Exception("Bulk reply expected!")
+      })
   }
 }
