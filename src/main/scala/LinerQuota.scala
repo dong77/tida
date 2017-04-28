@@ -17,5 +17,5 @@ class LinerQuota(maxQuota: Long, spread: Duration)(
   def removeQuota(key: String, quota: Long) = decayer.addValue(key, quota)
 
   def getQuota(key: String): Future[Long] =
-    decayer.getValue(key, System.currentTimeMillis).map { v => Math.max(0, maxQuota - v) }
+    decayer.getValue(key).map { v => Math.max(0, maxQuota - v) }
 }
