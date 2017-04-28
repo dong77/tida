@@ -6,7 +6,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import redis.protocol.Integer
 
-class HalflifeDecayer(halflife: Duration)(
+class LinerDecayer(spread: Duration)(
     implicit
     ec: ExecutionContext, redis: RedisClient
 ) extends Decayer {
@@ -17,19 +17,17 @@ class HalflifeDecayer(halflife: Duration)(
     RedisScript(content)
   }
 
-  private val getValueScript = scriptFromResource("/halflife_get_value.lua")
-  private val addValueScript = scriptFromResource("/halflife_add_value.lua")
+  private val getValueScript = scriptFromResource("/liner_get_value.lua")
+  private val addValueScript = scriptFromResource("/liner_add_value.lua")
 
-  private val halfLifeMillisAsString = halflife.toMillis.toString
-  private val expireMillisAsString = (halflife.toMillis * 20).toString
+  private val spreadMillisAsString = spread.toMillis.toString
 
   def addValue(key: String, value: Long, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       addValueScript,
       Seq(key),
       Seq(
-        halfLifeMillisAsString,
-        expireMillisAsString,
+        spreadMillisAsString,
         time.toString,
         value.toString
       )
@@ -44,7 +42,7 @@ class HalflifeDecayer(halflife: Duration)(
       getValueScript,
       Seq(key),
       Seq(
-        halfLifeMillisAsString,
+        spreadMillisAsString,
         time.toString
       )
     ).map(_ match {

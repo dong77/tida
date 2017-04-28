@@ -13,8 +13,8 @@ object Main extends App {
   implicit val akkaSystem = akka.actor.ActorSystem()
   implicit val redis = RedisClient()
 
-  val xyz: Decayer = new HalflifeDecayer(5 minutes)
-  val key = "aaaxcc"
+  val xyz: Decayer = new LinerDecayer(10 minutes)
+  val key = "gxaa"
   val f = for {
 
     w <- xyz.getValue(key, 0)
