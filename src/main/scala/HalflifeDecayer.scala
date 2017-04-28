@@ -39,7 +39,7 @@ class HalflifeDecayer(halflife: Duration)(
       })
   }
 
-  def getValue(key: String, time: Long): Future[Long] = {
+  def getValue(key: String, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       getValueScript,
       Seq(key),
