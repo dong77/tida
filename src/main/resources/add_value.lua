@@ -27,15 +27,7 @@ local sum = payload[2]
 
 -- update sum & modified
 sum = weight + sum * math.pow(0.5, (timestamp - modified) * 1.0 / half_life)
-modified = timestamp
-
--- the new sum is very close to 0 or less, we remove this key
-if sum < 0.00001 then
-  redis.call("DEL", key)
-  return 0
-end
-
-payload = cmsgpack.pack({modified, sum})
+payload = cmsgpack.pack({timestamp, sum})
 redis.call("SET", key, payload)
 redis.call("EXPIRE", key, expire)
 return sum -- result will be auto-convert to Integer or Long
