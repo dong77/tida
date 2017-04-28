@@ -12,13 +12,13 @@ class HalflifeDecayer(halflife: Duration)(
 ) extends Decayer {
 
   private def scriptFromResource(resource: String) = {
-    val file = getClass.getResource("/" + resource).getFile
+    val file = getClass.getResource(resource).getFile
     val content = scala.io.Source.fromFile(file).mkString
     RedisScript(content)
   }
 
-  private val getValueScript = scriptFromResource("get_value.lua")
-  private val addValueScript = scriptFromResource("add_value.lua")
+  private val getValueScript = scriptFromResource("/get_value.lua")
+  private val addValueScript = scriptFromResource("/add_value.lua")
 
   private val halfLifeMillisAsString = halflife.toMillis.toString
   private val expireMillisAsString = (halflife.toMillis * 20).toString
