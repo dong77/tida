@@ -1,6 +1,6 @@
 name := "tida"
 
-version := "2.0.0-SNAPSHOT"
+version := "2.0.0"
 
 organization := "io.dong.tools"
 
@@ -15,5 +15,15 @@ resolvers ++= Seq(
   "jeffmay" at "https://dl.bintray.com/jeffmay/maven")
 
 libraryDependencies ++= Seq(
-  "redis.clients" % "jedis" % "2.1.0",
   "com.github.etaty" %% "rediscala" % "1.8.0")
+
+credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
+  "oss.sonatype.org", "3U9tMk68",
+  "cohYQ7Ct1ONiS/1T5KrzIrfbdzGXhDCkao8ptPAhGlVo")
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
