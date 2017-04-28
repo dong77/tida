@@ -2,8 +2,18 @@ name := "tida"
 
 version := "1.1.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.9.1", "2.9.2", "2.10.0", "2.10.2")
+organization := "io.dong.tools"
 
-libraryDependencies += "redis.clients" % "jedis" % "2.1.0"
+scalaVersion := "2.11.8"
 
-libraryDependencies += "org.msgpack" % "msgpack" % "0.6.8"
+crossScalaVersions := Seq("2.11.8", "2.12.2")
+
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("snapshots"),
+  Resolver.sonatypeRepo("releases"),
+  Resolver.url("sbt-plugins", url("http://dl.bintray.com/zalando/sbt-plugins"))(Resolver.ivyStylePatterns),
+  "jeffmay" at "https://dl.bintray.com/jeffmay/maven")
+
+libraryDependencies ++= Seq(
+  "redis.clients" % "jedis" % "2.1.0",
+  "com.github.etaty" %% "rediscala" % "1.8.0")
