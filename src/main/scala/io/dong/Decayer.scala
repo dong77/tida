@@ -1,4 +1,4 @@
-package com.dong.tools.tida
+package com.dong.qard
 
 import scala.concurrent.Future
 

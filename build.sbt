@@ -1,8 +1,8 @@
-name := "tida"
+name := "qard"
 
-version := "2.0.1"
+version := "2.0.0"
 
-organization := "io.dong.tools"
+organization := "io.dong"
 
 scalaVersion := "2.11.8"
 
@@ -15,7 +15,8 @@ resolvers ++= Seq(
   "jeffmay" at "https://dl.bintray.com/jeffmay/maven")
 
 libraryDependencies ++= Seq(
-  "com.github.etaty" %% "rediscala" % "1.8.0")
+  "com.github.etaty" %% "rediscala" % "1.8.0",
+  "org.specs2" %% "specs2-core" % "3.8.9" % "test")
 
 credentials += Credentials(
   "Sonatype Nexus Repository Manager",

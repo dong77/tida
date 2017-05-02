@@ -1,4 +1,4 @@
-package com.dong.tools.tida
+package com.dong.qard
 
 import redis.api.scripting.RedisScript
 import redis.RedisClient
@@ -7,7 +7,9 @@ import scala.concurrent.duration._
 import redis.protocol.Integer
 
 class LinerQuota(maxQuota: Long, spread: Duration)(
-  implicit ec: ExecutionContext, redis: RedisClient) {
+    implicit
+    ec: ExecutionContext, redis: RedisClient
+) {
 
   private val decayer: Decayer = new LinerDecayer(spread)
 

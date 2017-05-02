@@ -1,4 +1,4 @@
-package com.dong.tools.tida
+package com.dong.qard
 
 import redis.api.scripting.RedisScript
 import redis.RedisClient
@@ -19,7 +19,7 @@ class LinerDecayer(spread: Duration)(
 
   private val getValueScript = scriptFromResource("/liner_get_value.lua")
   private val addValueScript = scriptFromResource("/liner_add_value.lua")
-  private val addValueIfSmallerThanScript = scriptFromResource("/liner_add_value_if_smaller_than.lua")
+  private val addValueIfSmallerThanScript = scriptFromResource("/liner_add_value_ist.lua")
 
   private val spreadMillisAsString = spread.toMillis.toString
 

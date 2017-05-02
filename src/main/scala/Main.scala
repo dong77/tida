@@ -1,10 +1,8 @@
-package com.dong.tools.tida
+package com.dong.qard
 
-import redis.api.scripting.RedisScript
 import redis.RedisClient
 import scala.concurrent._
 import scala.concurrent.duration._
-import redis.protocol.Integer
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
