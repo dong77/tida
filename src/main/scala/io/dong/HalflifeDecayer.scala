@@ -19,7 +19,7 @@ class HalflifeDecayer(halflife: Duration)(
 
   private val getValueScript = scriptFromResource("/halflife_get_value.lua")
   private val addValueScript = scriptFromResource("/halflife_add_value.lua")
-  private val addValueIfSmallerThanScript = scriptFromResource("/halflife_add_value_ist.lua")
+  private val addValueIfSmallerThanScript = scriptFromResource("/halflife_add_value_ilt.lua")
 
   private val halfLifeMillisAsString = halflife.toMillis.toString
   private val expireMillisAsString = (halflife.toMillis * 20).toString
@@ -40,7 +40,7 @@ class HalflifeDecayer(halflife: Duration)(
       })
   }
 
-  def addIfSmallerThan(key: String, value: Long, threshold: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+  def addIfLessThan(key: String, value: Long, threshold: Long, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       addValueIfSmallerThanScript,
       Seq(key),

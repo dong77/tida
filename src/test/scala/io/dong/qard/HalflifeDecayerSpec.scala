@@ -45,13 +45,13 @@ class HalflifeDecayerSpec extends Specification with AfterAll {
 
     "add value if current value is smaller than a threshold" >> {
       val k = key("003")
-      Await.result(decayer.addIfSmallerThan(k, 1000, 10, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfLessThan(k, 1000, 10, sometime), 5 seconds) == -1
       Await.result(decayer.add(k, 100000, sometime), 5 seconds) == 100000
-      Await.result(decayer.addIfSmallerThan(k, 1000, 10, sometime), 5 seconds) == -1
-      Await.result(decayer.addIfSmallerThan(k, 1000, 100000, sometime), 5 seconds) == -1
-      Await.result(decayer.addIfSmallerThan(k, 1000, 100001, sometime), 5 seconds) == 101000
-      Await.result(decayer.addIfSmallerThan(k, -1000, 100000, sometime), 5 seconds) == -1
-      Await.result(decayer.addIfSmallerThan(k, -10000000, 101001, sometime), 5 seconds) == 0
+      Await.result(decayer.addIfLessThan(k, 1000, 10, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfLessThan(k, 1000, 100000, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfLessThan(k, 1000, 100001, sometime), 5 seconds) == 101000
+      Await.result(decayer.addIfLessThan(k, -1000, 100000, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfLessThan(k, -10000000, 101001, sometime), 5 seconds) == 0
     }
   }
 }

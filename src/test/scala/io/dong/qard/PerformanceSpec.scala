@@ -22,7 +22,7 @@ class PerformanceSpec extends Specification with AfterAll {
   val rand = new scala.util.Random().nextLong
   def key(str: String) = str + rand
 
-  def measure(name: String, iteration: Int)(op: Int => Any) {
+  def measure(name: String, iteration: Int)(op: Int => Any): Float = {
     val start = System.currentTimeMillis
 
     (1 to 10000) foreach (op)
@@ -31,6 +31,7 @@ class PerformanceSpec extends Specification with AfterAll {
     val total = end - start
     val each = total.toFloat / iteration
     println(s"$iteration $name operations cost $total ms, each operation cost $each ms")
+    each
   }
 
   "LinerDecayer should" >> {
@@ -39,25 +40,23 @@ class PerformanceSpec extends Specification with AfterAll {
       val k = key("001")
       measure("get", 10000) { i =>
         Await.result(decayer.get(k + i, sometime + i), 5 seconds)
-      }
-      1 == 1
+      } < 0.5 //milliseconds
+
     }
 
     "`add` really fast" >> {
       val k = key("001")
       measure("add", 10000) { i =>
         Await.result(decayer.add(k + i, 100, sometime + i), 5 seconds)
-      }
-      1 == 1
+      } < 0.5 //milliseconds
     }
 
-    "`add` really fast" >> {
+    "`add+addIfLessThan` really fast" >> {
       val k = key("001")
-      measure("add+addIfSmallerThan", 10000) { i =>
+      measure("add+addIfLessThan", 10000) { i =>
         Await.result(decayer.add(k + i, 100, sometime + i), 5 seconds)
-        Await.result(decayer.addIfSmallerThan(k + i, 100, 1000, sometime + i), 5 seconds)
-      }
-      1 == 1
+        Await.result(decayer.addIfLessThan(k + i, 100, 1000, sometime + i), 5 seconds)
+      } < 0.5 //milliseconds
     }
 
   }

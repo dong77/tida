@@ -19,7 +19,7 @@ class LinerDecayer(spread: Duration)(
 
   private val getValueScript = scriptFromResource("/liner_get_value.lua")
   private val addValueScript = scriptFromResource("/liner_add_value.lua")
-  private val addValueIfSmallerThanScript = scriptFromResource("/liner_add_value_ist.lua")
+  private val addValueIfSmallerThanScript = scriptFromResource("/liner_add_value_ilt.lua")
 
   private val spreadMillisAsString = spread.toMillis.toString
 
@@ -38,7 +38,7 @@ class LinerDecayer(spread: Duration)(
       })
   }
 
-  def addIfSmallerThan(key: String, value: Long, threshold: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+  def addIfLessThan(key: String, value: Long, threshold: Long, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       addValueIfSmallerThanScript,
       Seq(key),
