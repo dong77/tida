@@ -6,10 +6,17 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import redis.protocol.Integer
 
-class Quota(maxQuota: Long, decayer: Decayer)(
+trait Quota {
+  def addQuota(key: String, quota: Long): Future[Long]
+  def removeQuota(key: String, quota: Long): Future[Long]
+  def getQuota(key: String): Future[Long]
+  def removeQuotaIfSuffcient(key: String, quota: Long): Future[Boolean]
+}
+
+class DecayerBasedQuota(maxQuota: Long, decayer: Decayer)(
     implicit
     ec: ExecutionContext
-) {
+) extends Quota {
   private def toQuota(v: Long) = Math.min(Math.max(0, maxQuota - v), maxQuota)
 
   def addQuota(key: String, quota: Long) = decayer.add(key, -quota).map(toQuota)
@@ -21,10 +28,10 @@ class Quota(maxQuota: Long, decayer: Decayer)(
 class LinerQuota(maxQuota: Long, spread: Duration)(
   implicit
   ec: ExecutionContext, redis: RedisClient
-) extends Quota(maxQuota, new LinerDecayer(spread))
+) extends DecayerBasedQuota(maxQuota, new LinerDecayer(spread))
 
 class HalflifeQuota(maxQuota: Long, halflife: Duration)(
   implicit
   ec: ExecutionContext, redis: RedisClient
-) extends Quota(maxQuota, new HalflifeDecayer(halflife))
+) extends DecayerBasedQuota(maxQuota, new HalflifeDecayer(halflife))
 
