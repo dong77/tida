@@ -17,13 +17,13 @@ object Main extends App {
   val key = "gxaa"
   val f = for {
 
-    w <- xyz.getValue(key, 0)
+    w <- xyz.get(key, 0)
     _ = println("weight: " + w)
-    w <- xyz.addValue(key, 100000, 0)
+    w <- xyz.add(key, 100000, 0)
     _ = println("weight: " + w)
-    w <- xyz.getValue(key, 5 * 60 * 1000)
+    w <- xyz.get(key, 5 * 60 * 1000)
     _ = println("weight: " + w)
-    w <- xyz.getValue(key, 10 * 60 * 1000)
+    w <- xyz.get(key, 10 * 60 * 1000)
     _ = println("weight: " + w)
   } yield ({})
 

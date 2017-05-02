@@ -19,11 +19,12 @@ class HalflifeDecayer(halflife: Duration)(
 
   private val getValueScript = scriptFromResource("/halflife_get_value.lua")
   private val addValueScript = scriptFromResource("/halflife_add_value.lua")
+  private val addValueIfSmallerThanScript = scriptFromResource("/halflife_add_value_ist.lua")
 
   private val halfLifeMillisAsString = halflife.toMillis.toString
   private val expireMillisAsString = (halflife.toMillis * 20).toString
 
-  def addValue(key: String, value: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+  def add(key: String, value: Long, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       addValueScript,
       Seq(key),
@@ -39,7 +40,24 @@ class HalflifeDecayer(halflife: Duration)(
       })
   }
 
-  def getValue(key: String, time: Long = System.currentTimeMillis): Future[Long] = {
+  def addIfSmallerThan(key: String, value: Long, threshold: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+    redis.evalshaOrEval(
+      addValueIfSmallerThanScript,
+      Seq(key),
+      Seq(
+        halfLifeMillisAsString,
+        expireMillisAsString,
+        time.toString,
+        value.toString,
+        threshold.toString
+      )
+    ).map(_ match {
+        case v: Integer => v.toLong
+        case _ => throw new Exception("Integer reply expected!")
+      })
+  }
+
+  def get(key: String, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       getValueScript,
       Seq(key),

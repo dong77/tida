@@ -4,6 +4,7 @@ local half_life  = tonumber(ARGV[1])
 local expire = tonumber(ARGV[2])
 local timestamp = tonumber(ARGV[3])
 local value  = tonumber(ARGV[4])
+local threshold  = tonumber(ARGV[5])
 
 -- check parameters
 if not key then return 0 end
@@ -11,9 +12,11 @@ if not half_life or half_life <= 0 then return 0 end
 if not expire or expire < 0 then return 0 end 
 if not timestamp or timestamp < 0 then return 0 end
 if not value or value < 0 then return 0 end
+if not threshold then return 0 end
 
 -- if the key is new
 if redis.call("EXISTS", key) == 0 then
+  if not value < threshold then return 0 end
   local payload =  cmsgpack.pack({timestamp, value})
   redis.call("SET", key, payload)
   redis.call("EXPIRE", key, expire)
@@ -26,15 +29,11 @@ local modified  = payload[1]
 local sum = payload[2]
 
 -- update sum & modified
-sum =  math.max(0, value + sum * math.pow(0.5, (timestamp - modified) * 1.0 / half_life))
+sum = sum * math.pow(0.5, (timestamp - modified) * 1.0 / half_life)
 
--- the new sum is very close to 0 or less, we remove this key
-if sum == 0 then
-  redis.call("DEL", key)
-  return 0
-end
+if not sum < threshold then return 0 end
 
-
+sum = math.max(0, sum + value)
 payload = cmsgpack.pack({timestamp, sum})
 redis.call("SET", key, payload)
 redis.call("EXPIRE", key, expire)

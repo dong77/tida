@@ -19,10 +19,11 @@ class LinerDecayer(spread: Duration)(
 
   private val getValueScript = scriptFromResource("/liner_get_value.lua")
   private val addValueScript = scriptFromResource("/liner_add_value.lua")
+  private val addValueIfSmallerThanScript = scriptFromResource("/liner_add_value_if_smaller_than.lua")
 
   private val spreadMillisAsString = spread.toMillis.toString
 
-  def addValue(key: String, value: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+  def add(key: String, value: Long, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       addValueScript,
       Seq(key),
@@ -37,7 +38,23 @@ class LinerDecayer(spread: Duration)(
       })
   }
 
-  def getValue(key: String, time: Long = System.currentTimeMillis): Future[Long] = {
+  def addIfSmallerThan(key: String, value: Long, threshold: Long, time: Long = System.currentTimeMillis): Future[Long] = {
+    redis.evalshaOrEval(
+      addValueIfSmallerThanScript,
+      Seq(key),
+      Seq(
+        spreadMillisAsString,
+        time.toString,
+        value.toString,
+        threshold.toString
+      )
+    ).map(_ match {
+        case v: Integer => v.toLong
+        case _ => throw new Exception("Integer reply expected!")
+      })
+  }
+
+  def get(key: String, time: Long = System.currentTimeMillis): Future[Long] = {
     redis.evalshaOrEval(
       getValueScript,
       Seq(key),

@@ -7,15 +7,11 @@ import scala.concurrent.duration._
 import redis.protocol.Integer
 
 class LinerQuota(maxQuota: Long, spread: Duration)(
-    implicit
-    ec: ExecutionContext, redis: RedisClient
-) {
+  implicit ec: ExecutionContext, redis: RedisClient) {
 
   private val decayer: Decayer = new LinerDecayer(spread)
 
-  def addQuota(key: String, quota: Long) = decayer.addValue(key, -quota)
-  def removeQuota(key: String, quota: Long) = decayer.addValue(key, quota)
-
-  def getQuota(key: String): Future[Long] =
-    decayer.getValue(key).map { v => Math.max(0, maxQuota - v) }
+  def addQuota(key: String, quota: Long) = decayer.add(key, -quota)
+  def removeQuota(key: String, quota: Long) = decayer.add(key, quota)
+  def getQuota(key: String): Future[Long] = decayer.get(key).map { v => Math.max(0, maxQuota - v) }
 }
