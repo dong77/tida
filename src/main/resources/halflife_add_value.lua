@@ -14,6 +14,7 @@ if not value then return -1 end
 
 -- if the key is new
 if redis.call("EXISTS", key) == 0 then
+  if value <=0 then return 0 end
   local payload =  cmsgpack.pack({timestamp, value})
   redis.call("SET", key, payload)
   redis.call("EXPIRE", key, expire)
