@@ -6,11 +6,11 @@ local timestamp = tonumber(ARGV[3])
 local value  = tonumber(ARGV[4])
 
 -- check parameters
-if not key then return 0 end
-if not half_life or half_life <= 0 then return 0 end
-if not expire or expire < 0 then return 0 end 
-if not timestamp or timestamp < 0 then return 0 end
-if not value or value < 0 then return 0 end
+if not key then return -1 end
+if not half_life or half_life <= 0 then return -1 end
+if not expire or expire < 0 then return -1 end 
+if not timestamp or timestamp < 0 then return -1 end
+if not value then return -1 end
 
 -- if the key is new
 if redis.call("EXISTS", key) == 0 then
@@ -33,7 +33,6 @@ if sum == 0 then
   redis.call("DEL", key)
   return 0
 end
-
 
 payload = cmsgpack.pack({timestamp, sum})
 redis.call("SET", key, payload)

@@ -23,19 +23,37 @@ class LinerDecayerSpec extends Specification with AfterAll {
   def key(str: String) = str + rand
 
   "LinerDecayer should" >> {
-
+    val sometime = System.currentTimeMillis
     "get and set value as expected" >> {
-      val sometime = System.currentTimeMillis
-      Await.result(decayer.get(key("001"), sometime), 5 seconds) == 0
-      Await.result(decayer.add(key("001"), 100000, sometime), 5 seconds) == 0
-      Await.result(decayer.get(key("001"), sometime), 5 seconds) == 100000
-      Await.result(decayer.get(key("001"), sometime + spread.toMillis / 2), 5 seconds) == 50000
-      Await.result(decayer.get(key("001"), sometime + spread.toMillis), 5 seconds) == 0
-      Await.result(decayer.get(key("001"), sometime - spread.toMillis / 2), 5 seconds) == 150000
-      Await.result(decayer.get(key("001"), sometime - spread.toMillis), 5 seconds) == 200000
-      Await.result(decayer.get(key("001"), sometime + spread.toMillis + 1), 5 seconds) == 0
-      Await.result(decayer.get(key("001"), sometime + (10000 days).toMillis), 5 seconds) == 0
-      Await.result(decayer.get(key("001"), Long.MaxValue), 5 seconds) == 0
+      val k = key("001")
+      Await.result(decayer.get(k, sometime), 5 seconds) == 0
+      Await.result(decayer.add(k, 100000, sometime), 5 seconds) == 100000
+      Await.result(decayer.get(k, sometime), 5 seconds) == 100000
+      Await.result(decayer.get(k, sometime + spread.toMillis / 2), 5 seconds) == 50000
+      Await.result(decayer.get(k, sometime + spread.toMillis), 5 seconds) == 0
+      Await.result(decayer.get(k, sometime - spread.toMillis / 2), 5 seconds) == 150000
+      Await.result(decayer.get(k, sometime - spread.toMillis), 5 seconds) == 200000
+      Await.result(decayer.get(k, sometime + spread.toMillis + 1), 5 seconds) == 0
+      Await.result(decayer.get(k, sometime + (10000 days).toMillis), 5 seconds) == 0
+      Await.result(decayer.get(k, Long.MaxValue), 5 seconds) == 0
+    }
+
+    "add minus value and still get 0 value" >> {
+      val k = key("002")
+      Await.result(decayer.get(k, sometime), 5 seconds) == 0
+      Await.result(decayer.add(k, -100000, sometime), 5 seconds) == 0
+      Await.result(decayer.get(k, sometime), 5 seconds) == 0
+    }
+
+    "add value if current value is smaller than a threshold" >> {
+      val k = key("003")
+      Await.result(decayer.addIfSmallerThan(k, 1000, 10, sometime), 5 seconds) == -1
+      Await.result(decayer.add(k, 100000, sometime), 5 seconds) == 100000
+      Await.result(decayer.addIfSmallerThan(k, 1000, 10, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfSmallerThan(k, 1000, 100000, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfSmallerThan(k, 1000, 100001, sometime), 5 seconds) == 101000
+      Await.result(decayer.addIfSmallerThan(k, -1000, 100000, sometime), 5 seconds) == -1
+      Await.result(decayer.addIfSmallerThan(k, -10000000, 101001, sometime), 5 seconds) == 0
     }
   }
 }

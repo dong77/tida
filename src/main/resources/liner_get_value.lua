@@ -4,9 +4,9 @@ local spread    = tonumber(ARGV[1])
 local timestamp = tonumber(ARGV[2])
 
 -- check parameters
-if not key then return 0 end
-if not spread or spread <= 0 then return 0 end
-if not timestamp or timestamp < 0 then return 0 end
+if not key then return -1 end
+if not spread or spread <= 0 then return -1 end
+if not timestamp or timestamp < 0 then return -1 end
 
 -- if the key doesn't exist at all
 if redis.call("EXISTS", key) == 0 then return 0 end
